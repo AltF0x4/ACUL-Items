@@ -16,7 +16,7 @@ export default function LoginIdPrompt() {
     const identifierInput = event.target.querySelector('input[name="username"]').value;
 
     // Hand off to the Auth0 pipeline
-    screenProvider.submit({ username: identifierInput });
+    screenProvider.login({ username: identifierInput });
   };
 
   return (
