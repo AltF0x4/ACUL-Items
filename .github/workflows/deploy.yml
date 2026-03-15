@@ -2,7 +2,7 @@ name: Deploy ACUL to GitHub Pages
 
 on:
   push:
-    branches: ["main"] # Assuming your default branch is main
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -23,21 +23,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
+          # I removed the cache requirement here so it stops looking for the lockfile
+          
       - name: Install dependencies
-        run: npm install
+        # Swapped to npm install so it generates the tree on the fly
+        run: npm install 
+        
       - name: Build
         run: npm run build
+        
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
