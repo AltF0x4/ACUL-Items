@@ -3,37 +3,43 @@ import LoginIdPrompt from './screens/LoginId';
 import LoginPasswordPrompt from './screens/LoginPassword'; 
 import * as Screens from '@auth0/auth0-acul-js';
 
-// 1. Import your local images so Vite bundles them with the correct GitHub Pages path
 import academyLogo from './assets/academy.png';
 import insuranceLogo from './assets/insurance.png';
 
 export default function App() {
   const [theme, setTheme] = useState('theme-default');
   const [screenName, setScreenName] = useState(null);
-  
-  // Initialize with null so the image tag doesn't render a broken link on load
   const [appData, setAppData] = useState({ name: 'Welcome', logo: null });
 
   useEffect(() => {
-    const genericScreen = new Screens.LoginId(); 
-    const clientId = genericScreen.client?.id || genericScreen.transaction?.client?.id;
-    const currentScreen = genericScreen.screen?.name;
-    
-    setScreenName(currentScreen);
+    let screenInstance;
+    let currentScreen = null;
 
-    // 2. Set the branding data using your imported image variables
+    // Safely detect which screen we are on by testing the SDK classes
+    try {
+      screenInstance = new Screens.LoginId();
+      currentScreen = 'login-id';
+    } catch (e) {
+      try {
+        screenInstance = new Screens.LoginPassword();
+        currentScreen = 'login-password';
+      } catch (err) {
+        console.error("Unknown screen or context missing.");
+        return;
+      }
+    }
+
+    setScreenName(currentScreen);
+    
+    // Extract the client ID safely now that we have the correct instance
+    const clientId = screenInstance.client?.id || screenInstance.transaction?.client?.id;
+
     if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
       setTheme('theme-academy');
-      setAppData({
-        name: 'Academy Learning Portal',
-        logo: academyLogo // Uses the imported academy.png
-      });
+      setAppData({ name: 'Academy Learning Portal', logo: academyLogo });
     } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
       setTheme('theme-insurance');
-      setAppData({
-        name: 'Insurance Management System',
-        logo: insuranceLogo // Uses the imported insurance.png
-      });
+      setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
     } else {
       setTheme('theme-default');
     }
