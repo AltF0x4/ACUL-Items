@@ -1,182 +1,55 @@
-/* --- Base Setup --- */
-:root {
-  --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --btn-bg: #374151;
-  --btn-text: #ffffff;
-  --card-bg: #ffffff;
+/* --- Global Logo & Branding Setup --- */
+.app-logo {
+  display: block;
+  margin: 0 auto 12px auto; /* Centers the logo [cite: 83] */
+  max-width: 120px;          /* Made logos smaller as requested */
+  height: auto;
+  mix-blend-mode: multiply;  /* Helps hide white backgrounds on PNGs */
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+.branding-header {
+  text-align: center;        /* Centers text for both apps */
+  margin-bottom: 24px;
 }
 
-/* --- Theming --- */
-
-/* Academy App (Blue Focus) */
-.theme-academy {
-  --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-  --text-primary: #1e3a8a; /* Deep Blue */
-  --btn-bg: #2563eb; /* Primary Blue */
-}
-
-/* Insurance/Investment App (Green Focus) */
-.theme-insurance {
-  --bg-gradient: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
-  --text-primary: #064e3b; /* Deep Green */
-  --btn-bg: #10b981; /* Emerald Green */
-}
-
-/* --- Layout & Components --- */
-.app-container {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--bg-gradient);
-}
-
+/* --- Base Card (Academy / Default) --- */
 .login-card {
-  background-color: var(--card-bg);
+  background-color: #ffffff;
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
+  transition: all 0.3s ease;
 }
 
-.branding-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.app-title {
-  color: var(--text-primary);
-  margin: 0 0 8px 0;
-  font-size: 24px;
-}
-
-.app-subtitle {
-  color: var(--text-secondary);
-  margin: 0;
-  font-size: 14px;
-}
-
-.input-group {
-  margin-bottom: 20px;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 16px;
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--btn-bg);
-  color: var(--btn-text);
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.submit-btn:hover {
-  opacity: 0.9;
-}
-
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.app-logo {
-  max-width: 160px;
-  height: auto;
-  margin-bottom: 16px;
-  mix-blend-mode: multiply; /* This removes white backgrounds from PNGs */
-  display: block;
-}
-/* --- Distinct Look for the Insurance App --- */
+/* --- Insurance App Theme (Black Card & Green Button) --- */
 .theme-insurance .login-card {
-  max-width: 500px; /* Make it wider than the standard 400px */
-  border-radius: 24px; /* Much rounder corners */
-  padding: 48px;
-  box-shadow: 0 20px 40px rgba(6, 78, 59, 0.15); /* Deep green shadow */
+  background-color: #000000;  /* Black box for login */
+  color: #ffffff;             /* White text for readability */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-.org-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.org-button {
-  width: 100%;
-  padding: 14px;
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  text-align: left;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.theme-insurance .branding-header {
-  text-align: left; /* Left align instead of center */
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 20px;
-  margin-bottom: 30px;
-}
-
-.theme-insurance .org-button:hover {
-  border-color: #10b981;
-  background: #f0fdf4;
-}
-
-.theme-academy .org-button:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
-}
-
-.theme-insurance .app-logo {
-  max-width: 180px;
-  margin-bottom: 24px;
-}
-
-.theme-insurance .app-title {
-  font-size: 28px;
-  font-weight: 700;
-}
-
+.theme-insurance .app-title,
+.theme-insurance .app-subtitle,
 .theme-insurance .input-group label {
-  font-weight: 600;
-  color: #064e3b; /* Match label to theme */
+  color: #ffffff;             /* Ensure all labels are visible on black */
+}
+
+.theme-insurance .input-group input {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  color: #ffffff;
 }
 
 .theme-insurance .submit-btn {
-  padding: 16px; /* Taller button */
-  border-radius: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  background-color: #10b981;  /* Specific Green Continue Button */
+  color: #000000;             /* Black text on green button for pop */
+  font-weight: 700;
+}
+
+/* --- Academy App Theme (Remains Blue) --- */
+.theme-academy .submit-btn {
+  background-color: #2563eb;
+  color: #ffffff;
 }
