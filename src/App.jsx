@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import LoginIdPrompt from './screens/LoginId';
 import LoginPasswordPrompt from './screens/LoginPassword'; 
+import OrganizationPickerPrompt from './screens/OrganizationPicker'; // <-- New
 import * as Screens from '@auth0/auth0-acul-js';
 
 import academyLogo from './assets/academy.png';
@@ -15,7 +16,7 @@ export default function App() {
     let screenInstance;
     let currentScreen = null;
 
-    // Safely detect which screen we are on by testing the SDK classes
+    // Detect screen context [cite: 228-243]
     try {
       screenInstance = new Screens.LoginId();
       currentScreen = 'login-id';
@@ -23,15 +24,20 @@ export default function App() {
       try {
         screenInstance = new Screens.LoginPassword();
         currentScreen = 'login-password';
-      } catch (err) {
-        console.error("Unknown screen or context missing.");
-        return;
+      } catch (e2) {
+        try {
+          // Organization-selection screen
+          screenInstance = new Screens.OrganizationSelection();
+          currentScreen = 'organization-selection';
+        } catch (e3) {
+          console.error("Context not found.");
+          return;
+        }
       }
     }
 
     setScreenName(currentScreen);
     
-    // Extract the client ID safely now that we have the correct instance
     const clientId = screenInstance.client?.id || screenInstance.transaction?.client?.id;
 
     if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
@@ -40,8 +46,6 @@ export default function App() {
     } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
       setTheme('theme-insurance');
       setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
-    } else {
-      setTheme('theme-default');
     }
   }, []);
 
@@ -53,6 +57,8 @@ export default function App() {
         return <LoginIdPrompt appData={appData} />;
       case 'login-password':
         return <LoginPasswordPrompt appData={appData} />;
+      case 'organization-selection':
+        return <OrganizationPickerPrompt appData={appData} />;
       default:
         return <p>Unknown screen: {screenName}</p>;
     }
