@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import LoginIdPrompt from './screens/LoginId';
 import LoginPasswordPrompt from './screens/LoginPassword'; 
+// Import the actual SDK class directly for the router
+import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 import OrganizationPickerPrompt from './screens/OrganizationPicker';
 import * as Screens from '@auth0/auth0-acul-js';
+
+import academyLogo from './assets/academy.png';
+import insuranceLogo from './assets/insurance.png';
 
 export default function App() {
   const [theme, setTheme] = useState('theme-default');
@@ -13,7 +18,6 @@ export default function App() {
     let screenInstance = null;
     let currentScreen = null;
 
-    // The order of instantiation matters for detection [cite: 231-243]
     try {
       screenInstance = new Screens.LoginId();
       currentScreen = 'login-id';
@@ -23,11 +27,11 @@ export default function App() {
         currentScreen = 'login-password';
       } catch (e2) {
         try {
-          // Change: Try the SelectOrganization class which corresponds to /u/organization-picker
-          screenInstance = new Screens.SelectOrganization(); 
+          // Initialize the exact OrganizationPicker class
+          screenInstance = new OrganizationPicker(); 
           currentScreen = 'organization-selection';
         } catch (e3) {
-          console.error("No matching SDK screen found for this context.");
+          console.error("SDK Error: Prompt context mismatch.");
         }
       }
     }
@@ -36,13 +40,12 @@ export default function App() {
       setScreenName(currentScreen);
       const clientId = screenInstance.client?.id || screenInstance.transaction?.client?.id;
 
-      // Academy - Blue
       if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
         setTheme('theme-academy');
-      } 
-      // Insurance - Black/Green
-      else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
+        setAppData({ name: 'Academy Learning Portal', logo: academyLogo });
+      } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
         setTheme('theme-insurance');
+        setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
       }
     }
   }, []);
