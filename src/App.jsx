@@ -6,13 +6,18 @@ export default function App() {
   const [theme, setTheme] = useState('theme-default');
   const [screenName, setScreenName] = useState(null);
 
-  useEffect(() => {
-    // We instantiate a generic screen to grab the initial context context
+useEffect(() => {
+    // Instantiate a generic screen to grab the context
     const genericScreen = new Screens.LoginId(); 
     
-    // Grab the client ID and screen name from the Auth0 transaction context
-    const clientId = genericScreen.transaction?.client?.id;
+    // Check both paths just to be perfectly safe, and log the entire object so we can see it!
+    const clientId = genericScreen.client?.id || genericScreen.transaction?.client?.id;
     const currentScreen = genericScreen.screen?.name;
+    
+    console.log("=== ACUL DEBUG ===");
+    console.log("Extracted Client ID:", clientId);
+    console.log("Screen Name:", currentScreen);
+    console.log("Full Screen Provider:", genericScreen);
     
     setScreenName(currentScreen);
 
@@ -21,6 +26,8 @@ export default function App() {
       setTheme('theme-academy'); // Blue
     } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
       setTheme('theme-insurance'); // Green
+    } else {
+      setTheme('theme-default'); // Gray Fallback
     }
   }, []);
 
