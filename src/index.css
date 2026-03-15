@@ -107,3 +107,9 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.app-logo {
+  max-width: 160px;
+  height: auto;
+  margin-bottom: 16px;
+}
