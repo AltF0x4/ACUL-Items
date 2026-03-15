@@ -1,14 +1,15 @@
 import React from 'react';
-// Match this to the class used in App.jsx
-import SelectOrganization from '@auth0/auth0-acul-js/select-organization'; 
+// The exact, verified import path
+import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 
 export default function OrganizationPickerPrompt({ appData }) {
-  const screenProvider = new SelectOrganization();
+  // Initialize the correct class
+  const screenProvider = new OrganizationPicker();
   const orgs = screenProvider.transaction?.organizations || [];
 
   const handleSelect = (orgId) => {
-    // The SDK method name must match the screen provider [cite: 103]
-    screenProvider.select({ organization: orgId });
+    // The verified method to submit the selected org
+    screenProvider.selectOrganization({ organization: orgId });
   };
 
   return (
