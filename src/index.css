@@ -1,55 +1,114 @@
-/* --- Global Logo & Branding Setup --- */
-.app-logo {
-  display: block;
-  margin: 0 auto 12px auto; /* Centers the logo [cite: 83] */
-  max-width: 120px;          /* Made logos smaller as requested */
-  height: auto;
-  mix-blend-mode: multiply;  /* Helps hide white backgrounds on PNGs */
+/* --- Global Layout (The "Anti-2000" Fix) --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
-.branding-header {
-  text-align: center;        /* Centers text for both apps */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;     /* Centers vertically */
+  background: var(--bg-gradient);
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
+/* --- The Card --- */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* --- Branding --- */
+.app-logo {
+  max-width: 100px; /* Small and elegant */
+  margin: 0 auto 20px auto;
+  display: block;
+}
+
+.app-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.app-subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 32px;
+}
+
+/* --- Forms & Inputs --- */
+.input-group {
+  text-align: left;
   margin-bottom: 24px;
 }
 
-/* --- Base Card (Academy / Default) --- */
-.login-card {
-  background-color: #ffffff;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+.input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+input {
   width: 100%;
-  max-width: 400px;
-  transition: all 0.3s ease;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border 0.2s;
 }
 
-/* --- Insurance App Theme (Black Card & Green Button) --- */
-.theme-insurance .login-card {
-  background-color: #000000;  /* Black box for login */
-  color: #ffffff;             /* White text for readability */
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s;
 }
 
-.theme-insurance .app-title,
-.theme-insurance .app-subtitle,
-.theme-insurance .input-group label {
-  color: #ffffff;             /* Ensure all labels are visible on black */
-}
+.submit-btn:active { transform: scale(0.98); }
 
-.theme-insurance .input-group input {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+/* --- Academy Theme (Clean/Blue) --- */
+.theme-academy {
+  --bg-gradient: #f8fafc;
+}
+.theme-academy .login-card { background: #ffffff; }
+.theme-academy .submit-btn { background: #2563eb; color: white; }
+
+/* --- Insurance Theme (Premium Black/Green) --- */
+.theme-insurance {
+  --bg-gradient: #111827; /* Dark background for the whole page */
+}
+.theme-insurance .login-card { 
+  background: #000000; 
   color: #ffffff;
+  border: 1px solid #333; /* Subtle border for definition */
+}
+.theme-insurance input {
+  background: #111827;
+  border: 1px solid #444;
+  color: white;
+}
+.theme-insurance .submit-btn { 
+  background: #10b981; 
+  color: #000000; 
 }
 
-.theme-insurance .submit-btn {
-  background-color: #10b981;  /* Specific Green Continue Button */
-  color: #000000;             /* Black text on green button for pop */
-  font-weight: 700;
-}
-
-/* --- Academy App Theme (Remains Blue) --- */
-.theme-academy .submit-btn {
-  background-color: #2563eb;
-  color: #ffffff;
+.theme-insurance .app-logo {
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px;
+  border-radius: 8px;
 }
