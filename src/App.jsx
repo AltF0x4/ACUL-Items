@@ -4,6 +4,9 @@ import LoginPasswordPrompt from './screens/LoginPassword';
 import OrganizationPickerPrompt from './screens/OrganizationPicker';
 import * as Screens from '@auth0/auth0-acul-js';
 
+import academyLogo from './assets/academy.png';
+import insuranceLogo from './assets/insurance.png';
+
 export default function App() {
   const [theme, setTheme] = useState('theme-default');
   const [screenName, setScreenName] = useState(null);
@@ -13,7 +16,9 @@ export default function App() {
     let screenInstance = null;
     let currentScreen = null;
 
-    // SDK screens must be instantiated based on the current prompt [cite: 111, 255]
+    // Log the raw window.location to see if Auth0 is passing clues in the URL
+    console.log("Current URL:", window.location.href);
+
     try {
       screenInstance = new Screens.LoginId();
       currentScreen = 'login-id';
@@ -23,32 +28,32 @@ export default function App() {
         currentScreen = 'login-password';
       } catch (e2) {
         try {
-          // This is the specific class for the Org Picker [cite: 257-259]
-          screenInstance = new Screens.OrganizationSelection();
+          // Try both common naming conventions for the Org Selection screen [cite: 111, 257]
+          screenInstance = new Screens.OrganizationSelection() || new Screens.SelectOrganization();
           currentScreen = 'organization-selection';
         } catch (e3) {
-          // If all fail, we might be on a screen we haven't mapped yet
-          console.warn("No matching SDK screen found for this prompt.");
+          console.error("SDK Error: Prompt context mismatch or unauthorized screen access.");
         }
       }
     }
 
-    if (currentScreen) {
+    if (currentScreen && screenInstance) {
       setScreenName(currentScreen);
+      // Ensure the client ID is pulled from the active instance [cite: 58, 271]
       const clientId = screenInstance.client?.id || screenInstance.transaction?.client?.id;
 
       if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
         setTheme('theme-academy');
-        // Set your Academy branding here
+        setAppData({ name: 'Academy Learning Portal', logo: academyLogo });
       } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
         setTheme('theme-insurance');
-        // Set your Insurance branding here
+        setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
       }
     }
   }, []);
 
   const renderComponent = () => {
-    if (!screenName) return <div className="loading">Initializing...</div>;
+    if (!screenName) return <div className="loading">Checking Authentication Context...</div>;
     
     switch (screenName) {
       case 'login-id': return <LoginIdPrompt appData={appData} />;
