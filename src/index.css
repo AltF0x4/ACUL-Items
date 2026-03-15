@@ -112,6 +112,8 @@ body {
   max-width: 160px;
   height: auto;
   margin-bottom: 16px;
+  mix-blend-mode: multiply; /* This removes white backgrounds from PNGs */
+  display: block;
 }
 /* --- Distinct Look for the Insurance App --- */
 .theme-insurance .login-card {
@@ -121,11 +123,40 @@ body {
   box-shadow: 0 20px 40px rgba(6, 78, 59, 0.15); /* Deep green shadow */
 }
 
+.org-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.org-button {
+  width: 100%;
+  padding: 14px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
 .theme-insurance .branding-header {
   text-align: left; /* Left align instead of center */
   border-bottom: 2px solid #e5e7eb;
   padding-bottom: 20px;
   margin-bottom: 30px;
+}
+
+.theme-insurance .org-button:hover {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.theme-academy .org-button:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
 }
 
 .theme-insurance .app-logo {
