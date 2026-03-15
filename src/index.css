@@ -113,3 +113,39 @@ body {
   height: auto;
   margin-bottom: 16px;
 }
+/* --- Distinct Look for the Insurance App --- */
+.theme-insurance .login-card {
+  max-width: 500px; /* Make it wider than the standard 400px */
+  border-radius: 24px; /* Much rounder corners */
+  padding: 48px;
+  box-shadow: 0 20px 40px rgba(6, 78, 59, 0.15); /* Deep green shadow */
+}
+
+.theme-insurance .branding-header {
+  text-align: left; /* Left align instead of center */
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.theme-insurance .app-logo {
+  max-width: 180px;
+  margin-bottom: 24px;
+}
+
+.theme-insurance .app-title {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.theme-insurance .input-group label {
+  font-weight: 600;
+  color: #064e3b; /* Match label to theme */
+}
+
+.theme-insurance .submit-btn {
+  padding: 16px; /* Taller button */
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
