@@ -112,3 +112,61 @@ input {
   padding: 10px;
   border-radius: 8px;
 }
+/* --- Organization List Styling --- */
+.org-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.org-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.org-button .arrow {
+  opacity: 0.5;
+  transition: transform 0.2s;
+}
+
+.org-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.org-button:hover .arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* --- Theme Specific Overrides for Org Picker --- */
+
+/* Academy (Blue Hover) */
+.theme-academy .org-button:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+/* Insurance (Black/Green High Contrast) */
+.theme-insurance .org-button {
+  background: #111827;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.theme-insurance .org-button:hover {
+  border-color: #10b981;
+  color: #10b981;
+  background: #000;
+}
