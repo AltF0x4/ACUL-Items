@@ -1,10 +1,17 @@
 import React from 'react';
-// IMPORT FIX: Standalone selectOrganization function
-import { selectOrganization, useClient, useTransaction, useUser } from "@auth0/auth0-acul-react/organization-picker";
+import { 
+  useOrganizationPicker, 
+  useClient, 
+  useTransaction, 
+  useUser 
+} from "@auth0/auth0-acul-react/organization-picker";
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
+  // 1. Initialize the hook into a variable (DO NOT destructure)
+  const picker = useOrganizationPicker();
+  
   const client = useClient();
   const transaction = useTransaction();
   const user = useUser();
@@ -19,12 +26,12 @@ export default function OrganizationPickerPrompt() {
   const orgs = transaction?.organizations || user?.organizations || [];
 
   const handleSelect = (org) => {
-    const validOrgId = org.id || org.organization_id || org.name;
+    // Safely grab the ID no matter what Auth0 named it
+    const orgId = org.organization_id || org.id;
     
-    // Use the standalone imported function
-    selectOrganization({ 
-      organization: validOrgId,
-      state: transaction?.state 
+    // 2. Call the method safely attached to the hook instance
+    picker.selectOrganization({ 
+      organization: orgId 
     });
   };
 
@@ -39,17 +46,23 @@ export default function OrganizationPickerPrompt() {
 
         <div className="org-list">
           {orgs.length > 0 ? (
-            orgs.map((org) => (
-              <button 
-                key={org.id || org.name} 
-                type="button" 
-                onClick={() => handleSelect(org)} 
-                className="org-button"
-              >
-                <span className="org-name">{org.display_name || org.name}</span>
-                <span className="arrow">→</span>
-              </button>
-            ))
+            orgs.map((org, index) => {
+              // Safely grab the name no matter what Auth0 named it
+              const displayName = org.organization_name || org.display_name || org.name || `Organization ${index + 1}`;
+              const orgId = org.organization_id || org.id;
+
+              return (
+                <button 
+                  key={orgId || index} 
+                  type="button" 
+                  onClick={() => handleSelect(org)} 
+                  className="org-button"
+                >
+                  <span className="org-name">{displayName}</span>
+                  <span className="arrow">→</span>
+                </button>
+              );
+            })
           ) : (
             <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
               <p>No organizations found in context.</p>
