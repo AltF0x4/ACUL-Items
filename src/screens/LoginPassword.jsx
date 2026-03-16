@@ -4,7 +4,8 @@ import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function LoginPasswordPrompt() {
-  const { login } = useLoginPassword();
+  // Grab the whole object
+  const loginPasswordProvider = useLoginPassword();
   const client = useClient();
 
   const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
@@ -16,7 +17,8 @@ export default function LoginPasswordPrompt() {
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    login({ password: event.target.password.value });
+    // Call it securely on the object
+    loginPasswordProvider.login({ password: event.target.password.value });
   };
 
   return (
