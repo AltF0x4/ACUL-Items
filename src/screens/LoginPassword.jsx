@@ -32,9 +32,12 @@ export default function LoginPasswordPrompt() {
     }
   };
 
-  const handleBack = () => {
-    // Safely go back to the previous screen while keeping the secure Auth0 URL intact!
-    window.history.back();
+const handleBack = () => {
+    // 1. Grab the current security parameters from the URL (e.g., ?state=xyz...)
+    const queryParams = window.location.search;
+    
+    // 2. Explicitly route back to the email screen, attaching the secure state
+    window.location.href = `/u/login${queryParams}`;
   };
 
   return (
