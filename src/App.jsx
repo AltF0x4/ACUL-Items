@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import LoginIdPrompt from './screens/LoginId';
 import LoginPasswordPrompt from './screens/LoginPassword'; 
-import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 import OrganizationPickerPrompt from './screens/OrganizationPicker';
-import * as Screens from '@auth0/auth0-acul-js';
 
 import academyLogo from './assets/academy.png';
 import insuranceLogo from './assets/insurance.png';
@@ -14,43 +12,32 @@ export default function App() {
   const [appData, setAppData] = useState({ name: 'Welcome', logo: null });
 
   useEffect(() => {
-    let screenInstance = null;
-    let currentScreen = null;
-
-    try {
-      screenInstance = new Screens.LoginId();
-      currentScreen = 'login-id';
-    } catch (e) {
-      try {
-        screenInstance = new Screens.LoginPassword();
-        currentScreen = 'login-password';
-      } catch (e2) {
-        try {
-          // Initialize the exact OrganizationPicker class
-          screenInstance = new OrganizationPicker(); 
-          currentScreen = 'organization-picker'; // Matched to Auth0's prompt name
-        } catch (e3) {
-          console.error("SDK Error: Prompt context mismatch.");
-        }
-      }
+    // 1. Read the raw Auth0 context directly from the window object
+    const context = window._auth0_context;
+    
+    if (!context) {
+      console.error("Auth0 context not found. Are you running this outside of Auth0?");
+      return;
     }
 
-    if (currentScreen && screenInstance) {
-      setScreenName(currentScreen);
-      const clientId = screenInstance.client?.id || screenInstance.transaction?.client?.id;
+    // 2. Safely extract the exact screen name Auth0 is asking for
+    const currentScreen = context.screen?.name;
+    setScreenName(currentScreen);
 
-      if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
-        setTheme('theme-academy');
-        setAppData({ name: 'Academy Learning Portal', logo: academyLogo });
-      } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
-        setTheme('theme-insurance');
-        setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
-      }
+    // 3. Extract the client ID for branding
+    const clientId = context.client?.id || context.transaction?.client?.id;
+
+    if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
+      setTheme('theme-academy');
+      setAppData({ name: 'Academy Learning Portal', logo: academyLogo });
+    } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
+      setTheme('theme-insurance');
+      setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
     }
   }, []);
 
   const renderComponent = () => {
-    if (!screenName) return <div className="loading">Loading Context...</div>;
+    if (!screenName) return <div className="loading">Loading App...</div>;
     
     switch (screenName) {
       case 'login-id': return <LoginIdPrompt appData={appData} />;
