@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import LoginIdPrompt from './screens/LoginId';
 import LoginPasswordPrompt from './screens/LoginPassword'; 
-// Import the actual SDK class directly for the router
 import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 import OrganizationPickerPrompt from './screens/OrganizationPicker';
 import * as Screens from '@auth0/auth0-acul-js';
@@ -29,7 +28,7 @@ export default function App() {
         try {
           // Initialize the exact OrganizationPicker class
           screenInstance = new OrganizationPicker(); 
-          currentScreen = 'organization-selection';
+          currentScreen = 'organization-picker'; // Matched to Auth0's prompt name
         } catch (e3) {
           console.error("SDK Error: Prompt context mismatch.");
         }
@@ -56,7 +55,7 @@ export default function App() {
     switch (screenName) {
       case 'login-id': return <LoginIdPrompt appData={appData} />;
       case 'login-password': return <LoginPasswordPrompt appData={appData} />;
-      case 'organization-selection': return <OrganizationPickerPrompt appData={appData} />;
+      case 'organization-picker': return <OrganizationPickerPrompt appData={appData} />;
       default: return <p>Unsupported Screen: {screenName}</p>;
     }
   };
