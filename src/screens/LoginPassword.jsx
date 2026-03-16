@@ -1,10 +1,10 @@
 import React from 'react';
-// IMPORT FIX: Standalone login function
-import { login, useClient } from '@auth0/auth0-acul-react/login-password';
+import { useLoginPassword, useClient } from '@auth0/auth0-acul-react/login-password';
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function LoginPasswordPrompt() {
+  const loginPasswordProvider = useLoginPassword();
   const client = useClient();
 
   const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
@@ -16,8 +16,12 @@ export default function LoginPasswordPrompt() {
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    // Use the standalone imported function
-    login({ password: event.target.password.value });
+    loginPasswordProvider.login({ password: event.target.password.value });
+  };
+
+  const handleBack = () => {
+    // Redirects to the root login URL to restart the flow
+    window.location.href = '/u/login';
   };
 
   return (
@@ -34,7 +38,23 @@ export default function LoginPasswordPrompt() {
             <label htmlFor="password">Password</label>
             <input type="password" name="password" id="password" required placeholder="Enter your password" />
           </div>
-          <button type="submit" className="submit-btn">Log In</button>
+          
+          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            {/* Back Button */}
+            <button 
+              type="button" 
+              onClick={handleBack} 
+              className="submit-btn" 
+              style={{ backgroundColor: 'transparent', color: '#666', border: '1px solid #ccc', flex: 1 }}
+            >
+              Back
+            </button>
+            
+            {/* Login Button */}
+            <button type="submit" className="submit-btn" style={{ flex: 2 }}>
+              Log In
+            </button>
+          </div>
         </form>
       </div>
     </div>
