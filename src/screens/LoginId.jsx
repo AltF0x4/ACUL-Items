@@ -4,10 +4,10 @@ import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function LoginIdPrompt() {
-  const { login } = useLoginId();
+  // Grab the whole object, DO NOT destructure!
+  const loginIdProvider = useLoginId(); 
   const client = useClient();
 
-  // Handle branding safely inside the component
   const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
   const isAcademy = client?.id === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og';
   
@@ -17,7 +17,8 @@ export default function LoginIdPrompt() {
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    login({ username: event.target.username.value });
+    // Call the method ON the object to keep the 'this' context safe
+    loginIdProvider.login({ username: event.target.username.value });
   };
 
   return (
