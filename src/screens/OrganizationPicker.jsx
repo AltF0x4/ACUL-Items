@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 // Exact import from the docs you linked
-import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
+import {
+  useOrganizationPicker,
+  useUser,
+  useTenant,
+  useBranding,
+  useClient,
+  useOrganization,
+  usePrompt,
+  useUntrustedData,
+} from "@auth0/auth0-acul-react/organization-picker";
 
 export default function OrganizationPickerPrompt({ appData }) {
   // Initialize as documented: new OrganizationPicker()
