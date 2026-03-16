@@ -11,7 +11,6 @@ import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
-  // 1. We MUST use the hook to keep the internal 'this' context intact!
   const picker = useOrganizationPicker();
   
   const client = useClient();
@@ -30,13 +29,16 @@ export default function OrganizationPickerPrompt() {
   const orgs = prompt?.organizations || screen?.organizations || transaction?.organizations || user?.organizations || [];
 
   const handleSelect = (orgId) => {
-    // 2. Call the method safely attached to the hook instance
     picker.selectOrganization({ organization: orgId });
   };
 
-  const handleSkip = () => {
-    // 3. Use Auth0's native method to bypass organizations
-    picker.skipOrganizationSelection();
+  // const handleSkip = () => {
+  //   picker.skipOrganizationSelection();
+  // };
+
+  const handleBack = () => {
+    // Redirects to the root login URL to restart the flow
+    window.location.href = '/u/login';
   };
 
   return (
@@ -67,11 +69,10 @@ export default function OrganizationPickerPrompt() {
             </div>
           )}
 
-          {/* Personal Account / Skip Option */}
+          {/* Commented out Personal Account logic
           <div style={{ textAlign: 'center', margin: '15px 0', color: '#888', fontSize: '14px' }}>
             or
           </div>
-          
           <button 
             type="button" 
             onClick={handleSkip} 
@@ -81,6 +82,18 @@ export default function OrganizationPickerPrompt() {
             <span className="org-name">Personal Account</span>
             <span className="arrow">→</span>
           </button>
+          */}
+
+          {/* Back Button */}
+          <button 
+            type="button" 
+            onClick={handleBack} 
+            className="org-button"
+            style={{ backgroundColor: 'transparent', border: 'none', color: '#888', marginTop: '15px', justifyContent: 'center' }}
+          >
+            <span className="org-name" style={{ textAlign: 'center', width: '100%' }}>← Back to Login</span>
+          </button>
+
         </div>
       </div>
     </div>
