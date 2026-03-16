@@ -1,10 +1,10 @@
 import React from 'react';
-import { useOrganizationPicker, useClient, useTransaction, useUser } from "@auth0/auth0-acul-react/organization-picker";
+// IMPORT FIX: Standalone selectOrganization function
+import { selectOrganization, useClient, useTransaction, useUser } from "@auth0/auth0-acul-react/organization-picker";
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
-  const orgPickerProvider = useOrganizationPicker();
   const client = useClient();
   const transaction = useTransaction();
   const user = useUser();
@@ -16,15 +16,13 @@ export default function OrganizationPickerPrompt() {
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
-  // Safely extract the array
   const orgs = transaction?.organizations || user?.organizations || [];
 
   const handleSelect = (org) => {
-    // Auth0 contexts differ; guarantee we grab the valid string identifier
     const validOrgId = org.id || org.organization_id || org.name;
     
-    // Pass BOTH the organization AND the security state so Auth0 doesn't throw a 400 Error
-    orgPickerProvider.selectOrganization({ 
+    // Use the standalone imported function
+    selectOrganization({ 
       organization: validOrgId,
       state: transaction?.state 
     });
