@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-// MUST be -js, not -react!
+// This line right here is what was breaking your build in this specific file!
 import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 
 export default function OrganizationPickerPrompt({ appData }) {
