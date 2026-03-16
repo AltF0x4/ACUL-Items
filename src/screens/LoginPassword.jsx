@@ -1,24 +1,20 @@
 import React from 'react';
-import LoginPassword from '@auth0/auth0-acul-js/login-password';
+import { useLoginPassword } from '@auth0/auth0-acul-react/login-password';
 
 export default function LoginPasswordPrompt({ appData }) {
-  // Initialize the SDK strictly for the password screen
-  const screenProvider = new LoginPassword();
+  const { login } = useLoginPassword();
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.setAttribute("disabled", "true");
-
-    // Grab the password and hand execution back to Auth0
-    const passwordInput = event.target.querySelector('input[name="password"]').value;
-    screenProvider.login({ password: passwordInput });
+    const passwordInput = event.target.password.value;
+    // Use the React Hook to submit
+    login({ password: passwordInput });
   };
 
   return (
     <div className="login-card">
       <div className="branding-header">
-        {appData.logo && <img src={appData.logo} alt={`${appData.name} Logo`} className="app-logo" />}
+        {appData.logo && <img src={appData.logo} alt="Logo" className="app-logo" />}
         <h1 className="app-title">{appData.name}</h1>
         <p className="app-subtitle">Please enter your password</p>
       </div>
