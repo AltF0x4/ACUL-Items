@@ -1,31 +1,42 @@
 import React from 'react';
-import { useLoginId } from '@auth0/auth0-acul-react/login-id';
+import { useLoginId, useClient } from '@auth0/auth0-acul-react/login-id';
+import academyLogo from '../assets/academy.png';
+import insuranceLogo from '../assets/insurance.png';
 
-export default function LoginIdPrompt({ appData }) {
+export default function LoginIdPrompt() {
   const { login } = useLoginId();
+  const client = useClient();
+
+  // Handle branding safely inside the component
+  const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
+  const isAcademy = client?.id === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og';
+  
+  const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
+  const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
+  const appName = isInsurance ? 'Insurance Management System' : (isAcademy ? 'Academy Learning Portal' : 'Welcome');
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    const identifierInput = event.target.username.value;
-    // Use the React Hook to submit
-    login({ username: identifierInput });
+    login({ username: event.target.username.value });
   };
 
   return (
-    <div className="login-card">
-      <div className="branding-header">
-        {appData.logo && <img src={appData.logo} alt="Logo" className="app-logo" />}
-        <h1 className="app-title">{appData.name}</h1>
-        <p className="app-subtitle">Please enter your email to continue</p>
-      </div>
-
-      <form onSubmit={formSubmitHandler} className="login-form">
-        <div className="input-group">
-          <label htmlFor="username">Email address</label>
-          <input type="email" name="username" id="username" required placeholder="Enter your email" />
+    <div className={`app-container ${theme}`}>
+      <div className="login-card">
+        <div className="branding-header">
+          {logo && <img src={logo} alt="Logo" className="app-logo" />}
+          <h1 className="app-title">{appName}</h1>
+          <p className="app-subtitle">Please enter your email to continue</p>
         </div>
-        <button type="submit" className="submit-btn">Continue</button>
-      </form>
+
+        <form onSubmit={formSubmitHandler} className="login-form">
+          <div className="input-group">
+            <label htmlFor="username">Email address</label>
+            <input type="email" name="username" id="username" required placeholder="Enter your email" />
+          </div>
+          <button type="submit" className="submit-btn">Continue</button>
+        </form>
+      </div>
     </div>
   );
 }
