@@ -1,68 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import LoginIdPrompt from './screens/LoginId';
-import LoginPasswordPrompt from './screens/LoginPassword'; 
+import React from 'react';
 import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
-import OrganizationPickerPrompt from './screens/OrganizationPicker';
-import * as Screens from '@auth0/auth0-acul-js';
 
-import academyLogo from './assets/academy.png';
-import insuranceLogo from './assets/insurance.png';
+export default function OrganizationPickerPrompt({ appData }) {
+  const screenProvider = new OrganizationPicker();
+  
+  // The organizations list is safely extracted from the user object
+  const orgs = screenProvider.user?.organizations || screenProvider.transaction?.organizations || [];
 
-export default function App() {
-  const [theme, setTheme] = useState('theme-default');
-  const [screenName, setScreenName] = useState(null);
-  const [appData, setAppData] = useState({ name: 'Welcome', logo: null });
-
-  useEffect(() => {
-    let screenInstance = null;
-    let currentScreen = null;
-
-    try {
-      screenInstance = new Screens.LoginId();
-      currentScreen = 'login-id';
-    } catch (e) {
-      try {
-        screenInstance = new Screens.LoginPassword();
-        currentScreen = 'login-password';
-      } catch (e2) {
-        try {
-          // Initialize the exact OrganizationPicker class
-          screenInstance = new OrganizationPicker(); 
-          currentScreen = 'organization-picker'; // Matched to Auth0's prompt name
-        } catch (e3) {
-          console.error("SDK Error: Prompt context mismatch.");
-        }
-      }
-    }
-
-    if (currentScreen && screenInstance) {
-      setScreenName(currentScreen);
-      const clientId = screenInstance.client?.id || screenInstance.transaction?.client?.id;
-
-      if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
-        setTheme('theme-academy');
-        setAppData({ name: 'Academy Learning Portal', logo: academyLogo });
-      } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
-        setTheme('theme-insurance');
-        setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
-      }
-    }
-  }, []);
-
-  const renderComponent = () => {
-    if (!screenName) return <div className="loading">Loading Context...</div>;
-    
-    switch (screenName) {
-      case 'login-id': return <LoginIdPrompt appData={appData} />;
-      case 'login-password': return <LoginPasswordPrompt appData={appData} />;
-      case 'organization-picker': return <OrganizationPickerPrompt appData={appData} />;
-      default: return <p>Unsupported Screen: {screenName}</p>;
-    }
+  const handleSelect = (orgId) => {
+    // Verified method to submit the selection back to Auth0
+    screenProvider.selectOrganization({ organization: orgId });
   };
 
   return (
-    <div className={`app-container ${theme}`}>
-      {renderComponent()}
+    <div className="login-card">
+      <div className="branding-header">
+        {appData.logo && <img src={appData.logo} alt="Logo" className="app-logo" />}
+        <h1 className="app-title">Select Account</h1>
+        <p className="app-subtitle">Choose the organization you want to access.</p>
+      </div>
+
+      <div className="org-list">
+        {orgs.length > 0 ? orgs.map((org) => (
+          <button key={org.id} onClick={() => handleSelect(org.id)} className="org-button">
+            <span className="org-name">{org.display_name || org.name}</span>
+            <span className="arrow">→</span>
+          </button>
+        )) : <p>No organizations found for your account.</p>}
+      </div>
     </div>
   );
 }
