@@ -34,9 +34,12 @@ export default function OrganizationPickerPrompt() {
     }
   };
 
-  const handleBack = () => {
-    // Safely go back to the previous screen without dropping the Auth0 transaction
-    window.history.back();
+const handleBack = () => {
+    // 1. Grab the current security parameters from the URL
+    const queryParams = window.location.search;
+    
+    // 2. Explicitly route back to the email screen, attaching the secure state
+    window.location.href = `/u/login${queryParams}`;
   };
 
   return (
