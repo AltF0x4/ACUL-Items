@@ -1,39 +1,24 @@
-import React, { useEffect, useState } from 'react';
-// Exact import from the docs you linked
-import {
-  useOrganizationPicker,
-  useUser,
-  useTenant,
-  useBranding,
-  useClient,
-  useOrganization,
-  usePrompt,
-  useUntrustedData,
+import React from 'react';
+import { 
+  useOrganizationPicker, 
+  useTransaction, 
+  useUser 
 } from "@auth0/auth0-acul-react/organization-picker";
 
 export default function OrganizationPickerPrompt({ appData }) {
-  // Initialize as documented: new OrganizationPicker()
-  const screenProvider = new OrganizationPicker();
-  const [orgs, setOrgs] = useState([]);
+  // 1. Initialize the Auth0 methods via the React Hook
+  const { selectOrganization } = useOrganizationPicker();
+  
+  // 2. Safely grab the context via React Hooks
+  const transaction = useTransaction();
+  const user = useUser();
 
-  useEffect(() => {
-    // Debug to help you see what Auth0 actually sent to the browser
-    console.log("=== SDK CONTEXT ===", screenProvider);
-
-    // According to Auth0's context, organizations could be nested in user or transaction
-    let availableOrgs = [];
-    if (screenProvider.user && Array.isArray(screenProvider.user.organizations)) {
-      availableOrgs = screenProvider.user.organizations;
-    } else if (screenProvider.transaction && Array.isArray(screenProvider.transaction.organizations)) {
-      availableOrgs = screenProvider.transaction.organizations;
-    }
-    
-    setOrgs(availableOrgs);
-  }, []);
+  // 3. Auth0 attaches the organizations array to the transaction object during the Identifier-First flow
+  const orgs = transaction?.organizations || user?.organizations || [];
 
   const handleSelect = (orgId) => {
-    // Official submission method from the docs you linked
-    screenProvider.selectOrganization({ organization: orgId });
+    // 4. Submit the selected organization ID back to Auth0
+    selectOrganization({ organization: orgId });
   };
 
   return (
@@ -54,10 +39,7 @@ export default function OrganizationPickerPrompt({ appData }) {
           ))
         ) : (
           <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-            <p>No organizations found in context.</p>
-            <p style={{ fontSize: '12px', marginTop: '10px' }}>
-              Press F12 and check the Console. If the array is missing, you must run the API PATCH.
-            </p>
+            <p>No organizations found for your account.</p>
           </div>
         )}
       </div>
