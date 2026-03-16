@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react';
-// This line right here is what was breaking your build in this specific file!
+// Strictly using the JS SDK as per the documentation
 import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 
 export default function OrganizationPickerPrompt({ appData }) {
+  // Initialize the class exactly as the JS SDK docs define
   const screenProvider = new OrganizationPicker();
   const [orgs, setOrgs] = useState([]);
 
   useEffect(() => {
-    console.log("=== SDK CONTEXT ===", screenProvider);
-
-    let availableOrgs = [];
-    if (screenProvider.user && Array.isArray(screenProvider.user.organizations)) {
-      availableOrgs = screenProvider.user.organizations;
-    } else if (screenProvider.transaction && Array.isArray(screenProvider.transaction.organizations)) {
-      availableOrgs = screenProvider.transaction.organizations;
-    }
-    
+    // The Auth0 context injects organizations into the transaction object
+    const availableOrgs = screenProvider.transaction?.organizations || [];
     setOrgs(availableOrgs);
+    
+    // Debug log to show you exactly what Auth0 transmitted
+    console.log("Auth0 Transaction Data:", screenProvider.transaction);
   }, []);
 
   const handleSelect = (orgId) => {
+    // The official submission method for the JS SDK
     screenProvider.selectOrganization({ organization: orgId });
   };
 
