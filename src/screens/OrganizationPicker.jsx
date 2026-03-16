@@ -39,7 +39,7 @@ const handleBack = () => {
     const queryParams = window.location.search;
     
     // 2. Explicitly route back to the email screen, attaching the secure state
-    window.location.href = `/u/login${queryParams}`;
+    window.location.href = `/u/login/identifier${queryParams}`;
   };
 
   return (
