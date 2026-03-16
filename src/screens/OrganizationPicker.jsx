@@ -1,20 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   useOrganizationPicker, 
   useClient, 
   useTransaction, 
-  useUser 
+  useUser,
+  usePrompt,
+  useScreen
 } from "@auth0/auth0-acul-react/organization-picker";
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
-  // 1. Initialize the hook into a variable (DO NOT destructure)
-  const picker = useOrganizationPicker();
+  // Use the official React hook to get the submission method
+  const { selectOrganization } = useOrganizationPicker();
   
   const client = useClient();
   const transaction = useTransaction();
   const user = useUser();
+  const prompt = usePrompt();
+  const screen = useScreen();
 
   const clientId = client?.id || transaction?.client?.id;
   const isInsurance = clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
@@ -23,16 +27,25 @@ export default function OrganizationPickerPrompt() {
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
-  const orgs = transaction?.organizations || user?.organizations || [];
+  // Search the entire Auth0 context for the organizations array
+  const orgs = prompt?.organizations || screen?.organizations || transaction?.organizations || user?.organizations || [];
+
+  useEffect(() => {
+    // This will print the EXACT shape of the organizations to your browser console (F12)
+    console.log("Raw Organizations Array from Auth0:", orgs);
+  }, [orgs]);
 
   const handleSelect = (org) => {
-    // Safely grab the ID no matter what Auth0 named it
-    const orgId = org.organization_id || org.id;
+    // If Auth0 sent a raw string (just the ID), use it. Otherwise, extract the ID from the object.
+    const isString = typeof org === 'string';
+    const orgId = isString ? org : (org.id || org.organization_id);
     
-    // 2. Call the method safely attached to the hook instance
-    picker.selectOrganization({ 
-      organization: orgId 
-    });
+    // Submit the real ID back to Auth0
+    if (orgId) {
+      selectOrganization({ organization: orgId });
+    } else {
+      console.error("Could not find a valid Organization ID in:", org);
+    }
   };
 
   return (
@@ -47,9 +60,14 @@ export default function OrganizationPickerPrompt() {
         <div className="org-list">
           {orgs.length > 0 ? (
             orgs.map((org, index) => {
-              // Safely grab the name no matter what Auth0 named it
-              const displayName = org.organization_name || org.display_name || org.name || `Organization ${index + 1}`;
-              const orgId = org.organization_id || org.id;
+              // Safely extract the data whether Auth0 sent a string or an object
+              const isString = typeof org === 'string';
+              const orgId = isString ? org : (org.id || org.organization_id);
+              
+              // Try to get the name, fallback to the raw ID if Auth0 hid the name
+              const displayName = isString 
+                ? `Org: ${org}` 
+                : (org.display_name || org.name || `Org: ${orgId}`);
 
               return (
                 <button 
