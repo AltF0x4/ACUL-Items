@@ -1,37 +1,29 @@
 import React, { useEffect, useState } from 'react';
+// Exact import from the docs you linked
 import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 
 export default function OrganizationPickerPrompt({ appData }) {
+  // Initialize as documented: new OrganizationPicker()
   const screenProvider = new OrganizationPicker();
   const [orgs, setOrgs] = useState([]);
 
   useEffect(() => {
-    // Let's log the entire Auth0 payload to the browser console (F12)
-    // so you can see exactly what Auth0 is sending you!
-    console.log("=== AUTH0 SDK PAYLOAD ===", screenProvider);
+    // Debug to help you see what Auth0 actually sent to the browser
+    console.log("=== SDK CONTEXT ===", screenProvider);
 
-    // Dynamically search for the organizations array in the 4 possible locations Auth0 uses
-    let foundOrgs = [];
-    if (Array.isArray(screenProvider.user?.organizations)) {
-      foundOrgs = screenProvider.user.organizations;
-      console.log("Found in: user.organizations");
-    } else if (Array.isArray(screenProvider.transaction?.organizations)) {
-      foundOrgs = screenProvider.transaction.organizations;
-      console.log("Found in: transaction.organizations");
-    } else if (Array.isArray(screenProvider.screen?.organizations)) {
-      foundOrgs = screenProvider.screen.organizations;
-      console.log("Found in: screen.organizations");
-    } else if (Array.isArray(screenProvider.prompt?.organizations)) {
-      foundOrgs = screenProvider.prompt.organizations;
-      console.log("Found in: prompt.organizations");
-    } else {
-      console.warn("Auth0 did not provide an organizations array in the context.");
+    // According to Auth0's context, organizations could be nested in user or transaction
+    let availableOrgs = [];
+    if (screenProvider.user && Array.isArray(screenProvider.user.organizations)) {
+      availableOrgs = screenProvider.user.organizations;
+    } else if (screenProvider.transaction && Array.isArray(screenProvider.transaction.organizations)) {
+      availableOrgs = screenProvider.transaction.organizations;
     }
-
-    setOrgs(foundOrgs);
+    
+    setOrgs(availableOrgs);
   }, []);
 
   const handleSelect = (orgId) => {
+    // Official submission method from the docs you linked
     screenProvider.selectOrganization({ organization: orgId });
   };
 
@@ -55,7 +47,7 @@ export default function OrganizationPickerPrompt({ appData }) {
           <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
             <p>No organizations found in context.</p>
             <p style={{ fontSize: '12px', marginTop: '10px' }}>
-              (Check console for payload debug)
+              Press F12 and check the Console. If the array is missing, you must run the API PATCH.
             </p>
           </div>
         )}
