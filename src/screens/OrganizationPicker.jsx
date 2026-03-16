@@ -11,7 +11,6 @@ import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
-  // Use the official React hook to get the submission method
   const { selectOrganization } = useOrganizationPicker();
   
   const client = useClient();
@@ -27,25 +26,15 @@ export default function OrganizationPickerPrompt() {
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
-  // Search the entire Auth0 context for the organizations array
   const orgs = prompt?.organizations || screen?.organizations || transaction?.organizations || user?.organizations || [];
 
   useEffect(() => {
-    // This will print the EXACT shape of the organizations to your browser console (F12)
     console.log("Raw Organizations Array from Auth0:", orgs);
   }, [orgs]);
 
-  const handleSelect = (org) => {
-    // If Auth0 sent a raw string (just the ID), use it. Otherwise, extract the ID from the object.
-    const isString = typeof org === 'string';
-    const orgId = isString ? org : (org.id || org.organization_id);
-    
-    // Submit the real ID back to Auth0
-    if (orgId) {
-      selectOrganization({ organization: orgId });
-    } else {
-      console.error("Could not find a valid Organization ID in:", org);
-    }
+  const handleSelect = (orgId) => {
+    // Submit using the exact organizationId parameter
+    selectOrganization({ organization: orgId });
   };
 
   return (
@@ -59,28 +48,18 @@ export default function OrganizationPickerPrompt() {
 
         <div className="org-list">
           {orgs.length > 0 ? (
-            orgs.map((org, index) => {
-              // Safely extract the data whether Auth0 sent a string or an object
-              const isString = typeof org === 'string';
-              const orgId = isString ? org : (org.id || org.organization_id);
-              
-              // Try to get the name, fallback to the raw ID if Auth0 hid the name
-              const displayName = isString 
-                ? `Org: ${org}` 
-                : (org.display_name || org.name || `Org: ${orgId}`);
-
-              return (
-                <button 
-                  key={orgId || index} 
-                  type="button" 
-                  onClick={() => handleSelect(org)} 
-                  className="org-button"
-                >
-                  <span className="org-name">{displayName}</span>
-                  <span className="arrow">→</span>
-                </button>
-              );
-            })
+            orgs.map((org, index) => (
+              <button 
+                key={org.organizationId || index} 
+                type="button" 
+                onClick={() => handleSelect(org.organizationId)} 
+                className="org-button"
+              >
+                {/* Use exact displayName for the UI */}
+                <span className="org-name">{org.displayName}</span>
+                <span className="arrow">→</span>
+              </button>
+            ))
           ) : (
             <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
               <p>No organizations found in context.</p>
