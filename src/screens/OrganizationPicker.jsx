@@ -4,7 +4,8 @@ import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
-  const { selectOrganization } = useOrganizationPicker();
+  // Grab the whole object
+  const orgPickerProvider = useOrganizationPicker();
   const client = useClient();
   const transaction = useTransaction();
   const user = useUser();
@@ -16,11 +17,11 @@ export default function OrganizationPickerPrompt() {
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
-  // The React SDK beautifully extracts your organizations safely
   const orgs = transaction?.organizations || user?.organizations || [];
 
   const handleSelect = (orgId) => {
-    selectOrganization({ organization: orgId });
+    // Call it securely on the object
+    orgPickerProvider.selectOrganization({ organization: orgId });
   };
 
   return (
