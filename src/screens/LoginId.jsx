@@ -1,11 +1,10 @@
 import React from 'react';
-import { useLoginId, useClient } from '@auth0/auth0-acul-react/login-id';
+// IMPORT FIX: login is a standalone function, not a hook!
+import { login, useClient } from '@auth0/auth0-acul-react/login-id';
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function LoginIdPrompt() {
-  // Grab the whole object, DO NOT destructure!
-  const loginIdProvider = useLoginId(); 
   const client = useClient();
 
   const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
@@ -17,8 +16,8 @@ export default function LoginIdPrompt() {
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    // Call the method ON the object to keep the 'this' context safe
-    loginIdProvider.login({ username: event.target.username.value });
+    // Use the standalone imported function
+    login({ username: event.target.username.value });
   };
 
   return (
