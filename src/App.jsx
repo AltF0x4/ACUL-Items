@@ -1,59 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginIdPrompt from './screens/LoginId';
-import LoginPasswordPrompt from './screens/LoginPassword'; 
+import LoginPasswordPrompt from './screens/LoginPassword';
 import OrganizationPickerPrompt from './screens/OrganizationPicker';
 
-// Strictly using the official React SDK hooks!
-import { useScreen, useClient, useTransaction } from '@auth0/auth0-acul-react/organization-picker';
-
-import academyLogo from './assets/academy.png';
-import insuranceLogo from './assets/insurance.png';
-
 export default function App() {
-  // 1. Use the React Hooks to pull the context safely
-  const screen = useScreen();
-  const client = useClient();
-  const transaction = useTransaction();
-
-  const [theme, setTheme] = useState('theme-default');
-  const [appData, setAppData] = useState({ name: 'Welcome', logo: null });
-
-  // 2. The hook automatically knows what screen Auth0 is asking for
-  const screenName = screen?.name;
+  const [screenName, setScreenName] = useState(null);
 
   useEffect(() => {
-    // 3. The hook automatically knows the client ID
-    const clientId = client?.id || transaction?.client?.id;
+    // 100% Native React routing based on the Auth0 URL.
+    const path = window.location.pathname.toLowerCase();
 
-    if (clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og') {
-      setTheme('theme-academy');
-      setAppData({ name: 'Academy Learning Portal', logo: academyLogo });
-    } else if (clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov') {
-      setTheme('theme-insurance');
-      setAppData({ name: 'Insurance Management System', logo: insuranceLogo });
+    if (path.includes('login-password')) {
+      setScreenName('login-password');
+    } else if (path.includes('organization-picker') || path.includes('organization-selection')) {
+      setScreenName('organization-picker');
+    } else {
+      setScreenName('login-id'); // Default fallback for the first screen
     }
-  }, [client, transaction]);
+  }, []);
 
-  const renderComponent = () => {
-    if (!screenName) return <div className="loading">Loading Context...</div>;
-    
-    switch (screenName) {
-      case 'login-id': 
-        return <LoginIdPrompt appData={appData} />;
-      case 'login-password': 
-        return <LoginPasswordPrompt appData={appData} />;
-      // Added a fallback case just in case Auth0 sends the alternate beta string
-      case 'organization-picker': 
-      case 'organization-selection': 
-        return <OrganizationPickerPrompt appData={appData} />;
-      default: 
-        return <p>Unsupported Screen: {screenName}</p>;
-    }
-  };
+  if (!screenName) return <div className="loading">Loading App...</div>;
 
-  return (
-    <div className={`app-container ${theme}`}>
-      {renderComponent()}
-    </div>
-  );
+  switch (screenName) {
+    case 'login-id': 
+      return <LoginIdPrompt />;
+    case 'login-password': 
+      return <LoginPasswordPrompt />;
+    case 'organization-picker': 
+      return <OrganizationPickerPrompt />;
+    default: 
+      return <p>Unsupported Screen: {screenName}</p>;
+  }
 }
