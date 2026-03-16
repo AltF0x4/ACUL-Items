@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { 
   useOrganizationPicker, 
   useClient, 
@@ -11,7 +11,8 @@ import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
-  const { selectOrganization } = useOrganizationPicker();
+  // 1. We MUST use the hook to keep the internal 'this' context intact!
+  const picker = useOrganizationPicker();
   
   const client = useClient();
   const transaction = useTransaction();
@@ -28,13 +29,14 @@ export default function OrganizationPickerPrompt() {
 
   const orgs = prompt?.organizations || screen?.organizations || transaction?.organizations || user?.organizations || [];
 
-  useEffect(() => {
-    console.log("Raw Organizations Array from Auth0:", orgs);
-  }, [orgs]);
-
   const handleSelect = (orgId) => {
-    // Submit using the exact organizationId parameter
-    selectOrganization({ organization: orgId });
+    // 2. Call the method safely attached to the hook instance
+    picker.selectOrganization({ organization: orgId });
+  };
+
+  const handleSkip = () => {
+    // 3. Use Auth0's native method to bypass organizations
+    picker.skipOrganizationSelection();
   };
 
   return (
@@ -55,16 +57,30 @@ export default function OrganizationPickerPrompt() {
                 onClick={() => handleSelect(org.organizationId)} 
                 className="org-button"
               >
-                {/* Use exact displayName for the UI */}
                 <span className="org-name">{org.displayName}</span>
                 <span className="arrow">→</span>
               </button>
             ))
           ) : (
-            <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-              <p>No organizations found in context.</p>
+            <div style={{ textAlign: 'center', padding: '10px', color: '#666' }}>
+              <p>No organizations found for this account.</p>
             </div>
           )}
+
+          {/* Personal Account / Skip Option */}
+          <div style={{ textAlign: 'center', margin: '15px 0', color: '#888', fontSize: '14px' }}>
+            or
+          </div>
+          
+          <button 
+            type="button" 
+            onClick={handleSkip} 
+            className="org-button"
+            style={{ backgroundColor: 'transparent', border: '1px solid #ccc' }}
+          >
+            <span className="org-name">Personal Account</span>
+            <span className="arrow">→</span>
+          </button>
         </div>
       </div>
     </div>
