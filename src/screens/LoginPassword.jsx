@@ -1,11 +1,10 @@
 import React from 'react';
-import { useLoginPassword, useClient } from '@auth0/auth0-acul-react/login-password';
+// IMPORT FIX: Standalone login function
+import { login, useClient } from '@auth0/auth0-acul-react/login-password';
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function LoginPasswordPrompt() {
-  // Grab the whole object
-  const loginPasswordProvider = useLoginPassword();
   const client = useClient();
 
   const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
@@ -17,8 +16,8 @@ export default function LoginPasswordPrompt() {
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    // Call it securely on the object
-    loginPasswordProvider.login({ password: event.target.password.value });
+    // Use the standalone imported function
+    login({ password: event.target.password.value });
   };
 
   return (
