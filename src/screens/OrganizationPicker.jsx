@@ -1,24 +1,26 @@
-import React from 'react';
-import { 
-  useOrganizationPicker, 
-  useTransaction, 
-  useUser 
-} from "@auth0/auth0-acul-react/organization-picker";
+import React, { useEffect, useState } from 'react';
+// MUST be -js, not -react!
+import OrganizationPicker from '@auth0/auth0-acul-js/organization-picker';
 
 export default function OrganizationPickerPrompt({ appData }) {
-  // 1. Initialize the Auth0 methods via the React Hook
-  const { selectOrganization } = useOrganizationPicker();
-  
-  // 2. Safely grab the context via React Hooks
-  const transaction = useTransaction();
-  const user = useUser();
+  const screenProvider = new OrganizationPicker();
+  const [orgs, setOrgs] = useState([]);
 
-  // 3. Auth0 attaches the organizations array to the transaction object during the Identifier-First flow
-  const orgs = transaction?.organizations || user?.organizations || [];
+  useEffect(() => {
+    console.log("=== SDK CONTEXT ===", screenProvider);
+
+    let availableOrgs = [];
+    if (screenProvider.user && Array.isArray(screenProvider.user.organizations)) {
+      availableOrgs = screenProvider.user.organizations;
+    } else if (screenProvider.transaction && Array.isArray(screenProvider.transaction.organizations)) {
+      availableOrgs = screenProvider.transaction.organizations;
+    }
+    
+    setOrgs(availableOrgs);
+  }, []);
 
   const handleSelect = (orgId) => {
-    // 4. Submit the selected organization ID back to Auth0
-    selectOrganization({ organization: orgId });
+    screenProvider.selectOrganization({ organization: orgId });
   };
 
   return (
@@ -39,7 +41,7 @@ export default function OrganizationPickerPrompt({ appData }) {
           ))
         ) : (
           <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-            <p>No organizations found for your account.</p>
+            <p>No organizations found in context.</p>
           </div>
         )}
       </div>
