@@ -12,7 +12,6 @@ import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
   const picker = useOrganizationPicker();
-  
   const client = useClient();
   const transaction = useTransaction();
   const user = useUser();
@@ -22,23 +21,22 @@ export default function OrganizationPickerPrompt() {
   const clientId = client?.id || transaction?.client?.id;
   const isInsurance = clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
   const isAcademy = clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og';
-  
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
   const orgs = prompt?.organizations || screen?.organizations || transaction?.organizations || user?.organizations || [];
 
-  const handleSelect = (orgId) => {
-    picker.selectOrganization({ organization: orgId });
+  const handleSelect = async (orgId) => {
+    try {
+      await picker.selectOrganization({ organization: orgId });
+    } catch (error) {
+      console.error("Failed to select organization:", error);
+    }
   };
 
-  // const handleSkip = () => {
-  //   picker.skipOrganizationSelection();
-  // };
-
   const handleBack = () => {
-    // Redirects to the root login URL to restart the flow
-    window.location.href = '/u/login';
+    // Safely go back to the previous screen without dropping the Auth0 transaction
+    window.history.back();
   };
 
   return (
@@ -69,31 +67,16 @@ export default function OrganizationPickerPrompt() {
             </div>
           )}
 
-          {/* Commented out Personal Account logic
-          <div style={{ textAlign: 'center', margin: '15px 0', color: '#888', fontSize: '14px' }}>
-            or
-          </div>
-          <button 
-            type="button" 
-            onClick={handleSkip} 
-            className="org-button"
-            style={{ backgroundColor: 'transparent', border: '1px solid #ccc' }}
-          >
-            <span className="org-name">Personal Account</span>
-            <span className="arrow">→</span>
-          </button>
-          */}
-
-          {/* Back Button */}
+          {/* Styled Arrow Back Button */}
           <button 
             type="button" 
             onClick={handleBack} 
             className="org-button"
-            style={{ backgroundColor: 'transparent', border: 'none', color: '#888', marginTop: '15px', justifyContent: 'center' }}
+            style={{ backgroundColor: 'transparent', border: 'none', color: '#0056b3', marginTop: '15px', justifyContent: 'center', gap: '8px' }}
           >
-            <span className="org-name" style={{ textAlign: 'center', width: '100%' }}>← Back to Login</span>
+            <span style={{ fontSize: '18px' }}>←</span>
+            <span className="org-name" style={{ flexGrow: 0 }}>Back</span>
           </button>
-
         </div>
       </div>
     </div>
