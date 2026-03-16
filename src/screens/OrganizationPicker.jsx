@@ -4,7 +4,6 @@ import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
-  // Grab the whole object
   const orgPickerProvider = useOrganizationPicker();
   const client = useClient();
   const transaction = useTransaction();
@@ -17,11 +16,18 @@ export default function OrganizationPickerPrompt() {
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
+  // Safely extract the array
   const orgs = transaction?.organizations || user?.organizations || [];
 
-  const handleSelect = (orgId) => {
-    // Call it securely on the object
-    orgPickerProvider.selectOrganization({ organization: orgId });
+  const handleSelect = (org) => {
+    // Auth0 contexts differ; guarantee we grab the valid string identifier
+    const validOrgId = org.id || org.organization_id || org.name;
+    
+    // Pass BOTH the organization AND the security state so Auth0 doesn't throw a 400 Error
+    orgPickerProvider.selectOrganization({ 
+      organization: validOrgId,
+      state: transaction?.state 
+    });
   };
 
   return (
@@ -36,7 +42,12 @@ export default function OrganizationPickerPrompt() {
         <div className="org-list">
           {orgs.length > 0 ? (
             orgs.map((org) => (
-              <button key={org.id} onClick={() => handleSelect(org.id)} className="org-button">
+              <button 
+                key={org.id || org.name} 
+                type="button" 
+                onClick={() => handleSelect(org)} 
+                className="org-button"
+              >
                 <span className="org-name">{org.display_name || org.name}</span>
                 <span className="arrow">→</span>
               </button>
