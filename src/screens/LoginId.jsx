@@ -23,8 +23,14 @@ export default function LoginIdPrompt() {
     event.preventDefault();
     setLocalError(null);
     
+    // Grab the email string
+    const emailEntered = event.target.username.value;
+    
+    // Save it directly to the browser so the next screen can read it
+    sessionStorage.setItem('acul_saved_email', emailEntered);
+    
     try {
-      await loginIdProvider.login({ username: event.target.username.value });
+      await loginIdProvider.login({ username: emailEntered });
     } catch (error) {
       console.error("Auth0 Error:", error);
       setLocalError(error.message || error.description || "Invalid email address. Please try again.");
@@ -54,19 +60,12 @@ export default function LoginIdPrompt() {
           <button type="submit" className="submit-btn">Continue</button>
         </form>
 
-        {/* Terms of Service Footer */}
         <div style={{ textAlign: 'center', marginTop: '25px', fontSize: '12px', color: '#666' }}>
           By continuing, you agree to our{' '}
-          <a 
-            href="https://github.com/AltF0x4/ACUL-Items" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ color: '#0056b3', textDecoration: 'none', fontWeight: 'bold' }}
-          >
+          <a href="https://github.com/AltF0x4/ACUL-Items" target="_blank" rel="noopener noreferrer" style={{ color: '#0056b3', textDecoration: 'none', fontWeight: 'bold' }}>
             Terms of Service
           </a>.
         </div>
-        
       </div>
     </div>
   );
