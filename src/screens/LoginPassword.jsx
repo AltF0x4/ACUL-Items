@@ -69,11 +69,13 @@ export default function LoginPasswordPrompt() {
               disabled 
               style={{ 
                 backgroundColor: '#e9ecef', 
-                color: '#000000',           
-                cursor: 'not-allowed',
+                color: '#555555',             // Dark gray text
                 border: '1px solid #ced4da',
                 opacity: 1,                 
-                WebkitTextFillColor: '#000000' 
+                WebkitTextFillColor: '#555555', // Safari dark gray text fix
+                userSelect: 'none',           // Prevents text highlighting
+                WebkitUserSelect: 'none',     // Safari highlight prevention
+                pointerEvents: 'none'         // Prevents clicking/focusing entirely
               }} 
             />
           </div>
