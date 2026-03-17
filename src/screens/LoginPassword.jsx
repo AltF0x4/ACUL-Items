@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useLoginPassword, useClient, useTransaction } from '@auth0/auth0-acul-react/login-password';
+// 1. Import useUser to grab the identifier from the first step
+import { useLoginPassword, useClient, useTransaction, useUser } from '@auth0/auth0-acul-react/login-password';
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
@@ -7,6 +8,7 @@ export default function LoginPasswordPrompt() {
   const loginPasswordProvider = useLoginPassword();
   const client = useClient();
   const transaction = useTransaction();
+  const user = useUser(); // Grab the user context
   
   const [localError, setLocalError] = useState(null);
 
@@ -19,12 +21,14 @@ export default function LoginPasswordPrompt() {
   const serverError = transaction?.errors?.[0]?.message || transaction?.errors?.[0]?.description;
   const displayError = localError || serverError;
 
+  // 2. Safely extract the email/username they entered on the previous screen
+  const identifier = user?.email || user?.username || transaction?.login_hint || '';
+
   const formSubmitHandler = async (event) => {
     event.preventDefault();
     setLocalError(null);
     
     try {
-      // Await the login to catch incorrect passwords without freezing the button
       await loginPasswordProvider.login({ password: event.target.password.value });
     } catch (error) {
       console.error("Auth0 Error:", error);
@@ -32,11 +36,8 @@ export default function LoginPasswordPrompt() {
     }
   };
 
-const handleBack = () => {
-    // 1. Grab the current security parameters from the URL (e.g., ?state=xyz...)
+  const handleBack = () => {
     const queryParams = window.location.search;
-    
-    // 2. Explicitly route back to the email screen, attaching the secure state
     window.location.href = `/u/login/identifier${queryParams}`;
   };
 
@@ -56,13 +57,31 @@ const handleBack = () => {
         )}
 
         <form onSubmit={formSubmitHandler} className="login-form">
+          
+          {/* 3. Grayed-out Identifier Field */}
+          <div className="input-group" style={{ marginBottom: '15px' }}>
+            <label htmlFor="disabled-username">Email address</label>
+            <input 
+              type="text" 
+              id="disabled-username" 
+              value={identifier} 
+              disabled 
+              style={{ 
+                backgroundColor: '#f5f5f5', 
+                color: '#888', 
+                cursor: 'not-allowed',
+                border: '1px solid #ddd'
+              }} 
+            />
+          </div>
+
           <div className="input-group">
             <label htmlFor="password">Password</label>
-            <input type="password" name="password" id="password" required placeholder="Enter your password" />
+            {/* Added autoFocus so the user doesn't have to click to start typing */}
+            <input type="password" name="password" id="password" required autoFocus placeholder="Enter your password" />
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '20px' }}>
-            {/* Styled Arrow Back Button */}
             <button 
               type="button" 
               onClick={handleBack} 
