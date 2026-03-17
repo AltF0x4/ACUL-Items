@@ -8,7 +8,6 @@ export default function LoginIdPrompt() {
   const client = useClient();
   const transaction = useTransaction();
   
-  // State to hold our local error message
   const [localError, setLocalError] = useState(null);
 
   const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
@@ -17,20 +16,17 @@ export default function LoginIdPrompt() {
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
   const appName = isInsurance ? 'Insurance Management System' : (isAcademy ? 'Academy Learning Portal' : 'Welcome');
 
-  // Check if Auth0 sent an error on page load, or use our local error
   const serverError = transaction?.errors?.[0]?.message || transaction?.errors?.[0]?.description;
   const displayError = localError || serverError;
 
   const formSubmitHandler = async (event) => {
     event.preventDefault();
-    setLocalError(null); // Clear previous errors
+    setLocalError(null);
     
     try {
-      // We MUST await the login so we can catch the error if it fails!
       await loginIdProvider.login({ username: event.target.username.value });
     } catch (error) {
       console.error("Auth0 Error:", error);
-      // Catch the error so the app doesn't freeze, and display it to the user
       setLocalError(error.message || error.description || "Invalid email address. Please try again.");
     }
   };
@@ -44,7 +40,6 @@ export default function LoginIdPrompt() {
           <p className="app-subtitle">Please enter your email to continue</p>
         </div>
 
-        {/* Display the error message if one exists */}
         {displayError && (
           <div style={{ color: '#d93025', backgroundColor: '#fce8e6', padding: '10px', borderRadius: '4px', marginBottom: '15px', textAlign: 'center', fontSize: '14px' }}>
             {displayError}
@@ -58,6 +53,20 @@ export default function LoginIdPrompt() {
           </div>
           <button type="submit" className="submit-btn">Continue</button>
         </form>
+
+        {/* Terms of Service Footer */}
+        <div style={{ textAlign: 'center', marginTop: '25px', fontSize: '12px', color: '#666' }}>
+          By continuing, you agree to our{' '}
+          <a 
+            href="https://github.com/AltF0x4/ACUL-Items" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ color: '#0056b3', textDecoration: 'none', fontWeight: 'bold' }}
+          >
+            Terms of Service
+          </a>.
+        </div>
+        
       </div>
     </div>
   );
