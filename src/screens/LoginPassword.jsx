@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useLoginPassword, useClient, useTransaction, useUser } from '@auth0/auth0-acul-react/login-password';
+import React, { useState, useEffect } from 'react';
+import { useLoginPassword, useClient, useTransaction } from '@auth0/auth0-acul-react/login-password';
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
 
@@ -7,9 +7,9 @@ export default function LoginPasswordPrompt() {
   const loginPasswordProvider = useLoginPassword();
   const client = useClient();
   const transaction = useTransaction();
-  const user = useUser();
   
   const [localError, setLocalError] = useState(null);
+  const [savedEmail, setSavedEmail] = useState('');
 
   const isInsurance = client?.id === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
   const isAcademy = client?.id === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og';
@@ -20,8 +20,11 @@ export default function LoginPasswordPrompt() {
   const serverError = transaction?.errors?.[0]?.message || transaction?.errors?.[0]?.description;
   const displayError = localError || serverError;
 
-  // Cast a wider net to guarantee we catch the email from Auth0's context
-  const identifier = user?.email || user?.username || transaction?.parsed_login_hint || transaction?.login_hint || '';
+  useEffect(() => {
+    // Read the email we saved on the previous screen
+    const emailFromStorage = sessionStorage.getItem('acul_saved_email') || '';
+    setSavedEmail(emailFromStorage);
+  }, []);
 
   const formSubmitHandler = async (event) => {
     event.preventDefault();
@@ -62,15 +65,15 @@ export default function LoginPasswordPrompt() {
             <input 
               type="text" 
               id="disabled-username" 
-              value={identifier} 
+              value={savedEmail} 
               disabled 
               style={{ 
-                backgroundColor: '#e9ecef', // Darker gray
-                color: '#000000',           // Solid black text
+                backgroundColor: '#e9ecef', 
+                color: '#000000',           
                 cursor: 'not-allowed',
                 border: '1px solid #ced4da',
-                opacity: 1,                 // Forces browsers to respect the color instead of washing it out
-                WebkitTextFillColor: '#000000' // Safari-specific override for disabled text
+                opacity: 1,                 
+                WebkitTextFillColor: '#000000' 
               }} 
             />
           </div>
