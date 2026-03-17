@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// 1. Import useUser to grab the identifier from the first step
 import { useLoginPassword, useClient, useTransaction, useUser } from '@auth0/auth0-acul-react/login-password';
 import academyLogo from '../assets/academy.png';
 import insuranceLogo from '../assets/insurance.png';
@@ -8,7 +7,7 @@ export default function LoginPasswordPrompt() {
   const loginPasswordProvider = useLoginPassword();
   const client = useClient();
   const transaction = useTransaction();
-  const user = useUser(); // Grab the user context
+  const user = useUser();
   
   const [localError, setLocalError] = useState(null);
 
@@ -21,8 +20,8 @@ export default function LoginPasswordPrompt() {
   const serverError = transaction?.errors?.[0]?.message || transaction?.errors?.[0]?.description;
   const displayError = localError || serverError;
 
-  // 2. Safely extract the email/username they entered on the previous screen
-  const identifier = user?.email || user?.username || transaction?.login_hint || '';
+  // Cast a wider net to guarantee we catch the email from Auth0's context
+  const identifier = user?.email || user?.username || transaction?.parsed_login_hint || transaction?.login_hint || '';
 
   const formSubmitHandler = async (event) => {
     event.preventDefault();
@@ -58,7 +57,6 @@ export default function LoginPasswordPrompt() {
 
         <form onSubmit={formSubmitHandler} className="login-form">
           
-          {/* 3. Grayed-out Identifier Field */}
           <div className="input-group" style={{ marginBottom: '15px' }}>
             <label htmlFor="disabled-username">Email address</label>
             <input 
@@ -67,17 +65,18 @@ export default function LoginPasswordPrompt() {
               value={identifier} 
               disabled 
               style={{ 
-                backgroundColor: '#f5f5f5', 
-                color: '#888', 
+                backgroundColor: '#e9ecef', // Darker gray
+                color: '#000000',           // Solid black text
                 cursor: 'not-allowed',
-                border: '1px solid #ddd'
+                border: '1px solid #ced4da',
+                opacity: 1,                 // Forces browsers to respect the color instead of washing it out
+                WebkitTextFillColor: '#000000' // Safari-specific override for disabled text
               }} 
             />
           </div>
 
           <div className="input-group">
             <label htmlFor="password">Password</label>
-            {/* Added autoFocus so the user doesn't have to click to start typing */}
             <input type="password" name="password" id="password" required autoFocus placeholder="Enter your password" />
           </div>
           
