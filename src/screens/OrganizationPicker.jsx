@@ -12,6 +12,7 @@ import insuranceLogo from '../assets/insurance.png';
 
 export default function OrganizationPickerPrompt() {
   const picker = useOrganizationPicker();
+  
   const client = useClient();
   const transaction = useTransaction();
   const user = useUser();
@@ -21,6 +22,7 @@ export default function OrganizationPickerPrompt() {
   const clientId = client?.id || transaction?.client?.id;
   const isInsurance = clientId === 'q7BNjQlXfqA0x8QlXvIkzy92xM3jKDov';
   const isAcademy = clientId === 'w1uejxlnncU8P2gyBXSv0OE8WlGcV6og';
+  
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
@@ -34,11 +36,21 @@ export default function OrganizationPickerPrompt() {
     }
   };
 
-const handleBack = () => {
+  const handleSkip = async () => {
+    try {
+      // This SDK method explicitly tells Auth0 to drop the organization requirement 
+      // and log the user in strictly with their personal account profile.
+      await picker.skipOrganizationSelection();
+    } catch (error) {
+      console.error("Failed to skip organization selection:", error);
+    }
+  };
+
+  const handleBack = () => {
     // 1. Grab the current security parameters from the URL
     const queryParams = window.location.search;
     
-    // 2. Explicitly route back to the email screen, attaching the secure state
+    // 2. Explicitly route back to the custom email prompt
     window.location.href = `/u/login/identifier${queryParams}`;
   };
 
@@ -70,6 +82,21 @@ const handleBack = () => {
             </div>
           )}
 
+          {/* Personal Account Option */}
+          <div style={{ textAlign: 'center', margin: '15px 0', color: '#888', fontSize: '14px' }}>
+            or
+          </div>
+          
+          <button 
+            type="button" 
+            onClick={handleSkip} 
+            className="org-button"
+            style={{ backgroundColor: 'transparent', border: '1px solid #ccc' }}
+          >
+            <span className="org-name">Personal Account</span>
+            <span className="arrow">→</span>
+          </button>
+
           {/* Styled Arrow Back Button */}
           <button 
             type="button" 
@@ -80,6 +107,7 @@ const handleBack = () => {
             <span style={{ fontSize: '18px' }}>←</span>
             <span className="org-name" style={{ flexGrow: 0 }}>Back</span>
           </button>
+
         </div>
       </div>
     </div>
