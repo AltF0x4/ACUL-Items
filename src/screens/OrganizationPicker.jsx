@@ -44,14 +44,13 @@ export default function OrganizationPickerPrompt() {
       console.error("Failed to skip organization selection:", error);
     }
   };
-
   const handleBack = () => {
-    // Redirect to Auth0's official logout endpoint.
-    // This securely destroys the partial session cookie and ends the transaction.
-    // Auth0 will then redirect the user back to your application's default logout URL so they can start fresh.
-    let back_link = `/u/login/identifier${queryParams}`;
-    window.location.href = `/oidc/logout?client_id=${clientId}&post_logout_redirect_uri={back_link}`;
-  };
+      // Grab the current transaction state from the URL (e.g., ?state=hKFo...)
+      const queryParams = window.location.search;
+      
+      // Redirect them directly back to the Auth0 identifier (Email) screen
+      window.location.href = `/u/login/identifier${queryParams}`;
+    };
 
   return (
     <div className={`app-container ${theme}`}>
