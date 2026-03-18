@@ -30,7 +30,6 @@ async function updateAuth0() {
   const { access_token } = await tokenRes.json();
   if (!access_token) throw new Error("Failed to get Auth0 token!");
 
-  // Explicitly map the Auth0 Prompt names to their exact Screen names
   const targets = [
     { prompt: 'login-id', screen: 'login-id' },
     { prompt: 'login-password', screen: 'login-password' },
@@ -42,16 +41,14 @@ async function updateAuth0() {
 
     let contextConfig = ["branding.settings"];
 
-    // Add the heavy organization data ONLY for the picker screen
+    // Add the extra branding/display data ONLY for the picker screen
+    // We removed the prompt/screen/transaction/user.organizations keys 
+    // because Auth0 sends them automatically!
     if (target.screen === 'organization-picker') {
       contextConfig = [
         "branding.settings",
         "organization.branding",
-        "organization.display_name",
-        "prompt.organizations",
-        "screen.organizations",
-        "transaction.organizations",
-        "user.organizations"
+        "organization.display_name"
       ];
     }
 
@@ -65,7 +62,6 @@ async function updateAuth0() {
       ]
     };
 
-    // Use the correctly mapped target.prompt and target.screen
     const res = await fetch(`https://${process.env.AUTH0_DOMAIN}/api/v2/prompts/${target.prompt}/screen/${target.screen}/rendering`, {
       method: 'PATCH',
       headers: {
