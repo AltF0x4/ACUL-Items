@@ -4,7 +4,6 @@ import path from 'path';
 async function updateAuth0() {
   console.log("Starting Auth0 ACUL Update...");
 
-  // 1. Find the newly generated JS and CSS files
   const assetsDir = path.resolve('./dist/assets');
   const files = fs.readdirSync(assetsDir);
   const jsFile = files.find(f => f.endsWith('.js') && f.startsWith('index-'));
@@ -16,7 +15,6 @@ async function updateAuth0() {
   const cssUrl = `https://AltF0x4.github.io/ACUL-Items/assets/${cssFile}`;
   console.log(`Found assets:\nJS: ${jsUrl}\nCSS: ${cssUrl}`);
 
-  // 2. Get an Auth0 Management API Token
   console.log("Fetching Auth0 Management Token...");
   const tokenRes = await fetch(`https://${process.env.AUTH0_DOMAIN}/oauth/token`, {
     method: 'POST',
@@ -32,17 +30,20 @@ async function updateAuth0() {
   const { access_token } = await tokenRes.json();
   if (!access_token) throw new Error("Failed to get Auth0 token!");
 
-  // 3. Update the prompts individually to avoid the Bulk API object wrapper errors
-  const prompts = ['login-id', 'login-password', 'organization-picker'];
+  // Explicitly map the Auth0 Prompt names to their exact Screen names
+  const targets = [
+    { prompt: 'login-id', screen: 'login-id' },
+    { prompt: 'login-password', screen: 'login-password' },
+    { prompt: 'organizations', screen: 'organization-picker' }
+  ];
   
-  for (const prompt of prompts) {
-    console.log(`Patching prompt: ${prompt}...`);
+  for (const target of targets) {
+    console.log(`Patching screen: ${target.screen}...`);
 
-    // Standard context that Auth0 accepts perfectly
     let contextConfig = ["branding.settings"];
 
     // Add the heavy organization data ONLY for the picker screen
-    if (prompt === 'organization-picker') {
+    if (target.screen === 'organization-picker') {
       contextConfig = [
         "branding.settings",
         "organization.branding",
@@ -64,8 +65,8 @@ async function updateAuth0() {
       ]
     };
 
-    // Fire the specific PATCH request we know works
-    const res = await fetch(`https://${process.env.AUTH0_DOMAIN}/api/v2/prompts/${prompt}/screen/${prompt}/rendering`, {
+    // Use the correctly mapped target.prompt and target.screen
+    const res = await fetch(`https://${process.env.AUTH0_DOMAIN}/api/v2/prompts/${target.prompt}/screen/${target.screen}/rendering`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${access_token}`,
@@ -76,9 +77,9 @@ async function updateAuth0() {
 
     if (!res.ok) {
       const err = await res.text();
-      throw new Error(`Failed to patch ${prompt}: ${err}`);
+      throw new Error(`Failed to patch ${target.screen}: ${err}`);
     }
-    console.log(`Successfully patched ${prompt}!`);
+    console.log(`Successfully patched ${target.screen}!`);
   }
 }
 
