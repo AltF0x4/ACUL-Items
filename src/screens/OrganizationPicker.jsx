@@ -49,7 +49,8 @@ export default function OrganizationPickerPrompt() {
     // Redirect to Auth0's official logout endpoint.
     // This securely destroys the partial session cookie and ends the transaction.
     // Auth0 will then redirect the user back to your application's default logout URL so they can start fresh.
-    window.location.href = `/v2/logout?client_id=${clientId}`;
+    let back_link = `/u/login/identifier${queryParams}`;
+    window.location.href = `/oidc/logout?client_id=${clientId}&post_logout_redirect_uri={back_link}`;
   };
 
   return (
