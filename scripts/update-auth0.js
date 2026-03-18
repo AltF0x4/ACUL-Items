@@ -48,7 +48,8 @@ async function updateAuth0() {
       contextConfig = [
         "branding.settings",
         "organization.branding",
-        "organization.display_name"
+        "organization.display_name",
+        "user.organizations"
       ];
     }
 
