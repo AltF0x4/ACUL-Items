@@ -32,26 +32,43 @@ async function updateAuth0() {
   const { access_token } = await tokenRes.json();
   if (!access_token) throw new Error("Failed to get Auth0 token!");
 
-  // 3. The exact payload Auth0 needs
-  const payload = {
-    rendering_mode: "advanced",
-    use_page_template: true,
-    context_configuration: [
-      "branding.settings", "client.id", "client.name", "organization.branding",
-      "organization.display_name", "prompt.organizations", "screen.organizations",
-      "transaction.organizations", "user.organizations"
-    ],
-    head_tags: [
-      { tag: "script", attributes: { src: jsUrl, type: "module", crossorigin: "anonymous" } },
-      { tag: "link", attributes: { rel: "stylesheet", href: cssUrl, crossorigin: "anonymous" } }
-    ]
-  };
-
-  // 4. Update the prompts!
+  // 3. The Prompts to update
   const prompts = ['login-id', 'login-password', 'organization-picker'];
   
   for (const prompt of prompts) {
     console.log(`Patching prompt: ${prompt}...`);
+
+    // BASE context for standard login screens
+    let contextConfig = [
+      "branding.settings", 
+      "client.id", 
+      "client.name"
+    ];
+
+    // ADVANCED context ONLY for the organization picker
+    if (prompt === 'organization-picker') {
+      contextConfig = [
+        ...contextConfig,
+        "organization.branding",
+        "organization.display_name",
+        "prompt.organizations",
+        "screen.organizations",
+        "transaction.organizations",
+        "user.organizations"
+      ];
+    }
+
+    const payload = {
+      rendering_mode: "advanced",
+      use_page_template: true,
+      context_configuration: contextConfig,
+      head_tags: [
+        { tag: "script", attributes: { src: jsUrl, type: "module", crossorigin: "anonymous" } },
+        { tag: "link", attributes: { rel: "stylesheet", href: cssUrl, crossorigin: "anonymous" } }
+      ]
+    };
+
+    // 4. Fire the PATCH request
     const res = await fetch(`https://${process.env.AUTH0_DOMAIN}/api/v2/prompts/${prompt}/screen/${prompt}/rendering`, {
       method: 'PATCH',
       headers: {
