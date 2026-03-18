@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 async function updateAuth0() {
-  console.log("Starting Auth0 ACUL Bulk Update...");
+  console.log("Starting Auth0 ACUL Update...");
 
   // 1. Find the newly generated JS and CSS files
   const assetsDir = path.resolve('./dist/assets');
@@ -32,36 +32,18 @@ async function updateAuth0() {
   const { access_token } = await tokenRes.json();
   if (!access_token) throw new Error("Failed to get Auth0 token!");
 
-  // 3. Define the HTML tags injected into Auth0
-  const headTags = [
-    { tag: "script", attributes: { src: jsUrl, type: "module", crossorigin: "anonymous" } },
-    { tag: "link", attributes: { rel: "stylesheet", href: cssUrl, crossorigin: "anonymous" } }
-  ];
+  // 3. Update the prompts individually to avoid the Bulk API object wrapper errors
+  const prompts = ['login-id', 'login-password', 'organization-picker'];
+  
+  for (const prompt of prompts) {
+    console.log(`Patching prompt: ${prompt}...`);
 
-  // 4. Build the Bulk Payload array according to the new API spec
-  const bulkPayload = [
-    {
-      prompt: "login-id",
-      screen: "login-id",
-      rendering_mode: "advanced",
-      use_page_template: true,
-      context_configuration: ["branding.settings"],
-      head_tags: headTags
-    },
-    {
-      prompt: "login-password",
-      screen: "login-password",
-      rendering_mode: "advanced",
-      use_page_template: true,
-      context_configuration: ["branding.settings"],
-      head_tags: headTags
-    },
-    {
-      prompt: "organization-picker",
-      screen: "organization-picker",
-      rendering_mode: "advanced",
-      use_page_template: true,
-      context_configuration: [
+    // Standard context that Auth0 accepts perfectly
+    let contextConfig = ["branding.settings"];
+
+    // Add the heavy organization data ONLY for the picker screen
+    if (prompt === 'organization-picker') {
+      contextConfig = [
         "branding.settings",
         "organization.branding",
         "organization.display_name",
@@ -69,28 +51,35 @@ async function updateAuth0() {
         "screen.organizations",
         "transaction.organizations",
         "user.organizations"
-      ],
-      head_tags: headTags
+      ];
     }
-  ];
 
-  // 5. Fire the single Bulk PATCH request
-  console.log("Sending Bulk PATCH request to Auth0...");
-  const res = await fetch(`https://${process.env.AUTH0_DOMAIN}/api/v2/prompts/rendering`, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': `Bearer ${access_token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(bulkPayload)
-  });
+    const payload = {
+      rendering_mode: "advanced",
+      use_page_template: true,
+      context_configuration: contextConfig,
+      head_tags: [
+        { tag: "script", attributes: { src: jsUrl, type: "module", crossorigin: "anonymous" } },
+        { tag: "link", attributes: { rel: "stylesheet", href: cssUrl, crossorigin: "anonymous" } }
+      ]
+    };
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Failed to execute bulk patch: ${err}`);
+    // Fire the specific PATCH request we know works
+    const res = await fetch(`https://${process.env.AUTH0_DOMAIN}/api/v2/prompts/${prompt}/screen/${prompt}/rendering`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Failed to patch ${prompt}: ${err}`);
+    }
+    console.log(`Successfully patched ${prompt}!`);
   }
-  
-  console.log("Successfully updated all prompts in a single request!");
 }
 
 updateAuth0().catch(err => {
