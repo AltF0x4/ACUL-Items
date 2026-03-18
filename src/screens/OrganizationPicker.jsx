@@ -45,12 +45,19 @@ export default function OrganizationPickerPrompt() {
     }
   };
   const handleBack = () => {
-      // Grab the current transaction state from the URL (e.g., ?state=hKFo...)
-      const queryParams = window.location.search;
-      
-      // Redirect them directly back to the Auth0 identifier (Email) screen
-      window.location.href = `/u/login/identifier${queryParams}`;
-    };
+    // 1. Where should the user land in YOUR app so your app can start a fresh Auth0 login?
+    // (Replace these with your actual local/production frontend URLs)
+    const insuranceAppHome = "https://isoft-insurance.vercel.app/"; 
+    const academyAppHome = "https://academy-inc.vercel.app/";
+
+    const targetAppUrl = isInsurance ? insuranceAppHome : academyAppHome;
+    const returnTo = encodeURIComponent(targetAppUrl);
+
+    // 2. We kill the current 'post-login' session and bounce them to your app.
+    // Your app will immediately realize they aren't logged in and redirect them 
+    // to Auth0 for a fresh /authorize request, giving them a clean Email screen!
+    window.location.href = `/v2/logout?client_id=${clientId}&returnTo=${returnTo}`;
+  };
 
   return (
     <div className={`app-container ${theme}`}>
