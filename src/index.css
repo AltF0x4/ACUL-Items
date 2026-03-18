@@ -92,8 +92,8 @@ input {
   --bg-gradient: #111827; /* Dark background for the whole page */
 }
 .theme-insurance .login-card { 
-  background: #B3B8D5;
-  color: #000000;
+  background: #000000;
+  color: #ffffff;
   border: 1px solid #333; /* Subtle border for definition */
 }
 .theme-insurance input {
