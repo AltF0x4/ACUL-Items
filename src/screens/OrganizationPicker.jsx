@@ -26,6 +26,7 @@ export default function OrganizationPickerPrompt() {
   const theme = isInsurance ? 'theme-insurance' : (isAcademy ? 'theme-academy' : 'theme-default');
   const logo = isInsurance ? insuranceLogo : (isAcademy ? academyLogo : null);
 
+  // Because we added user.organizations back to the API, this will now successfully populate!
   const orgs = prompt?.organizations || screen?.organizations || transaction?.organizations || user?.organizations || [];
 
   const handleSelect = async (orgId) => {
@@ -38,8 +39,6 @@ export default function OrganizationPickerPrompt() {
 
   const handleSkip = async () => {
     try {
-      // This SDK method explicitly tells Auth0 to drop the organization requirement 
-      // and log the user in strictly with their personal account profile.
       await picker.skipOrganizationSelection();
     } catch (error) {
       console.error("Failed to skip organization selection:", error);
@@ -47,11 +46,10 @@ export default function OrganizationPickerPrompt() {
   };
 
   const handleBack = () => {
-    // 1. Grab the current security parameters from the URL
-    const queryParams = window.location.search;
-    
-    // 2. Explicitly route back to the custom email prompt
-    window.location.href = `/u/login/identifier${queryParams}`;
+    // Redirect to Auth0's official logout endpoint.
+    // This securely destroys the partial session cookie and ends the transaction.
+    // Auth0 will then redirect the user back to your application's default logout URL so they can start fresh.
+    window.location.href = `/v2/logout?client_id=${clientId}`;
   };
 
   return (
@@ -72,7 +70,7 @@ export default function OrganizationPickerPrompt() {
                 onClick={() => handleSelect(org.organizationId)} 
                 className="org-button"
               >
-                <span className="org-name">{org.displayName}</span>
+                <span className="org-name">{org.displayName || org.name}</span>
                 <span className="arrow">→</span>
               </button>
             ))
@@ -97,7 +95,7 @@ export default function OrganizationPickerPrompt() {
             <span className="arrow">→</span>
           </button>
 
-          {/* Styled Arrow Back Button */}
+          {/* Styled Arrow Back Button (Now logs the user out) */}
           <button 
             type="button" 
             onClick={handleBack} 
@@ -105,7 +103,7 @@ export default function OrganizationPickerPrompt() {
             style={{ backgroundColor: 'transparent', border: 'none', color: '#0056b3', marginTop: '15px', justifyContent: 'center', gap: '8px' }}
           >
             <span style={{ fontSize: '18px' }}>←</span>
-            <span className="org-name" style={{ flexGrow: 0 }}>Back</span>
+            <span className="org-name" style={{ flexGrow: 0 }}>Back to Login</span>
           </button>
 
         </div>
